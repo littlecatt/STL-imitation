@@ -2,7 +2,7 @@
 
 template <typename T>
 DoublyLinkedList<T>::DoublyLinkedList()
-    : _front(nullptr), _back(nullptr){
+    : _front(nullptr), _back(nullptr), _size(0){
 }
 
 template <typename T>
@@ -65,6 +65,7 @@ void DoublyLinkedList<T>::push_front(T data){
         // re-assign
         _front = new_node;
     }
+    _size++;
 }
 template <typename T>
 void DoublyLinkedList<T>::pop_front(){
@@ -77,6 +78,7 @@ void DoublyLinkedList<T>::pop_front(){
         delete _front;
         _front = nullptr;
         _back = nullptr;
+        _size--;
     }
     else {
         // record next 
@@ -84,6 +86,7 @@ void DoublyLinkedList<T>::pop_front(){
         second->prev = nullptr;
         delete _front;
         _front = second;
+        _size--;
     }
 }
 template <typename T>
@@ -100,6 +103,7 @@ void DoublyLinkedList<T>::push_back(T data){
         // re-assign
         _back = new_node;
     }
+    _size++;
 }
 template <typename T>
 void DoublyLinkedList<T>::pop_back(){
@@ -112,6 +116,7 @@ void DoublyLinkedList<T>::pop_back(){
         delete _back;
         _front = nullptr;
         _back = nullptr;
+        _size--;
     }
     else {
         // record next 
@@ -119,11 +124,17 @@ void DoublyLinkedList<T>::pop_back(){
         second->next = nullptr;
         delete _back;
         _back = second;
+        _size--;
     }
 }
 
 template <typename T>
 void DoublyLinkedList<T>::insert_after(T data, Node<T>* target_node){
+    // invalid target
+    if (target_node == nullptr){
+        std::cout << "Invalid, target node is nullptr\n";
+        return;
+    }
     // target node is the back node
     if (target_node == _back){
         this->push_back(data);    
@@ -136,9 +147,15 @@ void DoublyLinkedList<T>::insert_after(T data, Node<T>* target_node){
     new_node->prev = target_node;
     new_node->next = temp;
     temp->prev = new_node;
+    _size++;
 }
 template <typename T>
 void DoublyLinkedList<T>::insert_before(T data, Node<T>* target_node){
+    // invalid target
+    if (target_node == nullptr){
+        std::cout << "Invalid, target node is nullptr\n";
+        return;
+    }
     // target node is the front node
     if (target_node == _front){
         this->push_front(data);    
@@ -151,9 +168,15 @@ void DoublyLinkedList<T>::insert_before(T data, Node<T>* target_node){
     new_node->next = target_node;
     new_node->prev = temp;
     temp->next = new_node;
+    _size++;
 }
 template <typename T>
 void DoublyLinkedList<T>::erase(Node<T>* target_node){
+    // invalid target
+    if (target_node == nullptr){
+        std::cout << "Invalid, target node is nullptr\n";
+        return;
+    }
     // erase front node
     if (target_node == _front){
         this->pop_front();
@@ -170,6 +193,7 @@ void DoublyLinkedList<T>::erase(Node<T>* target_node){
     prev_node->next = next_node;
     next_node->prev = prev_node;
     delete target_node;
+    _size--;
 } 
 
 template <typename T>
@@ -199,4 +223,70 @@ void DoublyLinkedList<T>::clear(){
         // move on to next node
         curr = temp;
     }
+    _size = 0;
+}
+
+// Operations
+
+template <typename T>
+Node<T>* DoublyLinkedList<T>::find(const T &target_data){
+    Node<T> *curr = _front;
+    while(curr != nullptr){
+        if (curr->data == target_data){
+            break;
+        }
+        curr = curr->next;
+    }
+    return curr;
+}
+template <typename T>
+void DoublyLinkedList<T>::reverse(){
+    Node<T> *curr = _front;
+    while(curr != nullptr){
+        // swap its own prev & next
+        Node<T> *temp = curr->next;
+        curr->next = curr->prev;
+        curr->prev = temp; 
+        // advance
+        curr = curr->prev; // prev is now the original next
+    }
+    // swap front and back
+    Node<T> *temp = _back;
+    _back = _front;
+    _front = temp; // curr is now original back
+}
+template <typename T>
+void DoublyLinkedList<T>::sort(){
+
+} 
+
+template <typename T>
+size_t DoublyLinkedList<T>::remove(const T &data){
+    Node<T> *curr = _front;
+    size_t n_of_removed{0};
+    while(curr != nullptr){
+        Node<T> *temp = curr->next;
+        if (curr->data == data){
+            n_of_removed++;
+            this->erase(curr);
+        }
+        curr = temp;
+    }
+    return n_of_removed;
+}
+
+template <typename T> 
+template <typename UnaryPredicate>
+size_t DoublyLinkedList<T>::remove_if(UnaryPredicate p){
+    Node<T> *curr = _front;
+    size_t n_of_removed{0};
+    while(curr != nullptr){
+        Node<T> *temp = curr->next;
+        if (p(curr->data)){
+            n_of_removed++;
+            this->erase(curr);
+        }
+        curr = temp;
+    }    
+    return n_of_removed;
 }
