@@ -1,5 +1,6 @@
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
+#include <iostream>
 
 template <typename T>
 class vector{
@@ -10,7 +11,7 @@ class vector{
     public:
         // Constructors
         vector();
-        vector(size_t count, const T &value=T());
+        vector(size_t count, const T &value);
         vector(std::initializer_list<T> init);
         // Copy constructor
         vector(const vector &other);
@@ -38,8 +39,9 @@ class vector{
         void resize(size_t count, const T &default_value);
         void swap(vector &other);
 
+        void display();
 };
 
-#include "vector.tpp";
+#include "vector.tpp"
 
 #endif
